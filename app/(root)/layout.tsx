@@ -1,15 +1,16 @@
-import type { Metadata } from "next";
-export const metadata: Metadata = {
-  title: "Hospital Management System",
-  description: "HMS - Patient, Doctor, and Admin Portal",
-};
+import Navbar from "@/components/web/Navbar"
+// import { Footer } from "@/components/web/footer";
 
-export default function RootLayout({
+export default function PublicLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
   return (
-    {children}
+    <>
+      <Navbar />
+      <main>{children}</main>
+      {/* <Footer /> */}
+    </>
   );
 }
