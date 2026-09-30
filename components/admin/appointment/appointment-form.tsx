@@ -59,17 +59,24 @@ export function AppointmentForm({
   useEffect(() => {
     fetchDoctors()
     fetchPatients()
-  }, [fetchDoctors, fetchPatients])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
+  // Sirf ek baar initial data set karo (mount pe), baar baar reset na ho
   useEffect(() => {
-    setForm({ ...DEFAULT_FORM, ...initialData })
-  }, [initialData])
+    setForm((prev) => ({ ...DEFAULT_FORM, ...initialData }))
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   const validate = () => {
     const newErrors: Record<string, string[]> = {}
 
-    if (!form.patient_id) newErrors.patient_id = ["Patient is required."]
-    if (!form.doctor_id) newErrors.doctor_id = ["Doctor is required."]
+    // Edit mode mein patient/doctor disabled hain, is liye validate mat karo
+    if (mode === "create") {
+      if (!form.patient_id) newErrors.patient_id = ["Patient is required."]
+      if (!form.doctor_id) newErrors.doctor_id = ["Doctor is required."]
+    }
+
     if (!form.appointment_date) newErrors.appointment_date = ["Date is required."]
     if (!form.appointment_time) newErrors.appointment_time = ["Time is required."]
 
@@ -104,6 +111,21 @@ export function AppointmentForm({
       ? "Update"
       : "Book Appointment"
 
+  // Edit mode mein jab tak patients/doctors load nahi hote, naam ki jagah id dikha do (fallback)
+  const selectedPatientLabel = (() => {
+    const selected = patients.find((p) => String(p.id) === form.patient_id)
+    if (selected) return `${selected.name} ${selected.last_name ?? ""}`
+    if (mode === "edit" && form.patient_id) return "Loading..."
+    return undefined
+  })()
+
+  const selectedDoctorLabel = (() => {
+    const selected = doctors.find((d) => String(d.id) === form.doctor_id)
+    if (selected) return selected.user?.name
+    if (mode === "edit" && form.doctor_id) return "Loading..."
+    return undefined
+  })()
+
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       {/* Patient */}
@@ -116,14 +138,7 @@ export function AppointmentForm({
         >
           <SelectTrigger id="patient_id" className="w-full">
             <SelectValue placeholder="Select a patient">
-              {(() => {
-                const selected = patients.find(
-                  (p) => String(p.id) === form.patient_id
-                )
-                return selected
-                  ? `${selected.name} ${selected.last_name ?? ""}`
-                  : undefined
-              })()}
+              {selectedPatientLabel}
             </SelectValue>
           </SelectTrigger>
           <SelectContent>
@@ -149,7 +164,7 @@ export function AppointmentForm({
         >
           <SelectTrigger id="doctor_id" className="w-full">
             <SelectValue placeholder="Select a doctor">
-              {doctors.find((d) => String(d.id) === form.doctor_id)?.user?.name}
+              {selectedDoctorLabel}
             </SelectValue>
           </SelectTrigger>
           <SelectContent>

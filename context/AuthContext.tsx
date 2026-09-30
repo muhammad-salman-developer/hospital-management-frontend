@@ -9,6 +9,7 @@ import {
 } from "react";
 import { useRouter } from "next/navigation";
 import api from "@/lib/axios";
+import { toast } from "sonner";
 
 interface RegisterData {
   name: string;
@@ -68,11 +69,9 @@ export function AuthProvider({
         setUser(res.data.user);
         setRole(res.data.role);
 
-        // localStorage ko fresh, verified data se sync kar dein
         localStorage.setItem("user", JSON.stringify(res.data.user));
         localStorage.setItem("role", res.data.role);
       } catch (err) {
-        // Token invalid/expired/tampered - sab clear kar dein
         localStorage.removeItem("token");
         localStorage.removeItem("role");
         localStorage.removeItem("user");
@@ -97,13 +96,15 @@ export function AuthProvider({
     try {
       await api.post("/register", data);
 
-      router.push("/check-email");   // 👈 pehle /login tha, ab yahan redirect
+      toast.success("Registration successful! Please check your email to verify your account.");
+      router.push("/check-email");
     } catch (err: any) {
       const message =
         err.response?.data?.message ||
         "Registration failed.";
 
       setError(message);
+      toast.error(message);
 
       throw err;
     } finally {
@@ -127,7 +128,6 @@ export function AuthProvider({
         user: userData,
       } = res.data;
 
-      // Save authentication data
       localStorage.setItem("token", token);
       localStorage.setItem("role", userRole);
       localStorage.setItem(
@@ -135,11 +135,11 @@ export function AuthProvider({
         JSON.stringify(userData)
       );
 
-      // Update React state
       setUser(userData);
       setRole(userRole);
 
-      // Redirect according to role
+      toast.success(`Welcome back, ${userData?.name ?? "there"}!`);
+
       if (userRole === "admin") {
         router.push("/admin/dashboard");
       } else if (userRole === "doctor") {
@@ -155,12 +155,12 @@ export function AuthProvider({
         "Login failed.";
 
       setError(message);
+      toast.error(message);
 
       throw err;
     } finally {
       setLoading(false);
     }
-    
   };
 
   // =========================
@@ -172,16 +172,14 @@ export function AuthProvider({
     } catch (err) {
       console.error("Logout error:", err);
     } finally {
-      // Remove authentication data
       localStorage.removeItem("token");
       localStorage.removeItem("role");
       localStorage.removeItem("user");
 
-      // Clear user state
       setUser(null);
       setRole(null);
 
-      // Go to login
+      toast.success("You have been logged out.");
       router.push("/login");
     }
   };

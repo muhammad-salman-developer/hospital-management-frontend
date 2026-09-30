@@ -2,54 +2,77 @@
 
 import { useEffect, useState } from "react"
 import Link from "next/link"
-import { ArrowUpRight, Stethoscope } from "lucide-react"
+import { useRouter } from "next/navigation"
 import { motion } from "framer-motion"
+import { ArrowUpRight } from "lucide-react"
 import api from "@/lib/axios"
+import { Doctor } from "@/types/doctor"
+import { DoctorSchedule } from "@/types/doctorSchedule"
+import DoctorCard from "@/components/web/doctors/DoctorCard"
+import BookingModal from "@/components/web/doctors/BookingModal"
+import { useAuth } from "@/hooks/useAuth"
+import { toast } from "sonner"
 
-const STORAGE_URL =
-    process.env.NEXT_PUBLIC_API_URL?.replace("/api", "") ??
-    "http://127.0.0.1:8000"
-
-interface Doctor {
-    id: number
-    specialization: string
-    qualification: string
-    consultation_fee: string
-    image: string | null
-    user?: {
-        name: string
-    }
-    department?: {
-        id: number
-        name: string
-    }
-}
-
-interface DoctorSchedule {
-    id: number
-    doctor_id: number
-    day: string
-    start_time: string
-    end_time: string
-    is_available: boolean
-}
-
-const DAY_SHORT: Record<string, string> = {
-    monday: "Mon",
-    tuesday: "Tue",
-    wednesday: "Wed",
-    thursday: "Thu",
-    friday: "Fri",
-    saturday: "Sat",
-    sunday: "Sun",
-}
+const STORAGE_URL = process.env.NEXT_PUBLIC_STORAGE_URL ?? ""
 
 export function DoctorsSection() {
+    const { user } = useAuth()
+    const router = useRouter()
+
     const [doctors, setDoctors] = useState<Doctor[]>([])
-    const [schedulesByDoctor, setSchedulesByDoctor] = useState<
-        Record<number, DoctorSchedule[]>
-    >({})
+    const [schedulesByDoctor, setSchedulesByDoctor] = useState<Record<number, DoctorSchedule[]>>({})
+    const [isBookingModalOpen, setIsBookingModalOpen] = useState(false)
+    const [selectedDoctor, setSelectedDoctor] = useState<Doctor | null>(null)
+    const [selectedSchedule, setSelectedSchedule] = useState<DoctorSchedule | null>(null)
     const [loading, setLoading] = useState(true)
+    const [booking, setBooking] = useState(false)
+    const [bookingError, setBookingError] = useState("")
+
+    const openBookingModal = (doctor: Doctor) => {
+        if (!user) {
+            router.push("/login")
+            return
+        }
+        setSelectedDoctor(doctor)
+        setSelectedSchedule(null)
+        setBookingError("")
+        setIsBookingModalOpen(true)
+    }
+
+    const closeBookingModal = () => {
+        setIsBookingModalOpen(false)
+        setSelectedDoctor(null)
+        setSelectedSchedule(null)
+        setBookingError("")
+    }
+
+    // ================= CONFIRM BOOKING =================
+    const handleBookingConfirm = async (patientId: number, appointmentDate: string) => {
+        if (!selectedDoctor || !selectedSchedule) return
+
+        setBooking(true)
+        setBookingError("")
+
+        try {
+            const res = await api.post("/appointments", {
+                patient_id: patientId,
+                doctor_id: selectedDoctor.id,
+                doctor_shedule_id: selectedSchedule.id,
+                appointment_date: appointmentDate,
+                appointment_time: selectedSchedule.start_time,
+            })
+
+            closeBookingModal()
+            toast.success("Appointment booked successfully!")
+        } catch (error: any) {
+            console.error("Failed to create appointment:", error)
+            const message = error?.response?.data?.message ?? "Failed to book appointment. Please try again."
+            setBookingError(message)
+            toast.error(message)
+        } finally {
+            setBooking(false)
+        }
+    }
 
     useEffect(() => {
         const fetchDoctorsAndSchedules = async () => {
@@ -57,9 +80,7 @@ export function DoctorsSection() {
                 const doctorsRes = await api.get("/doctors")
 
                 const doctorsData: Doctor[] =
-                    doctorsRes.data.data?.data ??
-                    doctorsRes.data.data ??
-                    []
+                    doctorsRes.data.data?.data ?? doctorsRes.data.data ?? []
 
                 const featured = doctorsData.slice(0, 6)
 
@@ -69,18 +90,15 @@ export function DoctorsSection() {
                     featured.map((doc) =>
                         api
                             .get("/doctor-shedules", {
-                                params: {
-                                    doctor_id: doc.id,
-                                },
+                                params: { doctor_id: doc.id },
                             })
                             .then((res) => ({
                                 doctorId: doc.id,
-                                schedules: (res.data.data ??
-                                    []) as DoctorSchedule[],
+                                schedules: (res.data.data ?? []) as DoctorSchedule[],
                             }))
                             .catch(() => ({
                                 doctorId: doc.id,
-                                schedules: [],
+                                schedules: [] as DoctorSchedule[],
                             }))
                     )
                 )
@@ -88,10 +106,9 @@ export function DoctorsSection() {
                 const map: Record<number, DoctorSchedule[]> = {}
 
                 scheduleResults.forEach((result) => {
-                    map[result.doctorId] =
-                        result.schedules.filter(
-                            (schedule) => schedule.is_available
-                        )
+                    map[result.doctorId] = result.schedules.filter(
+                        (schedule) => schedule.is_available
+                    )
                 })
 
                 setSchedulesByDoctor(map)
@@ -156,147 +173,22 @@ export function DoctorsSection() {
 
                     /* ================= DOCTOR CARDS ================= */
                     <div className="flex snap-x snap-mandatory gap-5 overflow-x-auto pb-5 scrollbar-none">
-                        {doctors.map((doctor, index) => {
-                            const schedules =
-                                schedulesByDoctor[doctor.id] ?? []
-
-                            return (
-                                <motion.div
-                                    key={doctor.id}
-                                    initial={{
-                                        opacity: 0,
-                                        y: 25,
-                                    }}
-                                    whileInView={{
-                                        opacity: 1,
-                                        y: 0,
-                                    }}
-                                    viewport={{
-                                        once: true,
-                                        amount: 0.2,
-                                    }}
-                                    transition={{
-                                        duration: 0.5,
-                                        delay: index * 0.08,
-                                    }}
-                                    className="w-72 shrink-0 snap-start"
-                                >
-                                    <Link
-                                        href={`/doctors/${doctor.id}`}
-                                        className="group block overflow-hidden rounded-2xl border border-white/10 bg-[#082C3C] shadow-lg transition-all duration-300 hover:-translate-y-1 hover:border-[#36B9A6]/40 hover:shadow-xl"
-                                    >
-
-                                        {/* ================= IMAGE ================= */}
-                                        <div className="relative aspect-[4/4.2] w-full overflow-hidden bg-[#0B3445]">
-
-                                            {doctor.image ? (
-                                                <img
-                                                    src={`${STORAGE_URL}/storage/${doctor.image}`}
-                                                    alt={
-                                                        doctor.user?.name ??
-                                                        "Doctor"
-                                                    }
-                                                    className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
-                                                />
-                                            ) : (
-                                                <div className="flex h-full w-full items-center justify-center">
-                                                    <Stethoscope className="size-12 text-[#36B9A6]/40" />
-                                                </div>
-                                            )}
-
-                                            {/* Image Overlay */}
-                                            <div className="absolute inset-0 bg-gradient-to-t from-[#071E2B]/90 via-[#071E2B]/10 to-transparent" />
-
-                                            {/* ================= DEPARTMENT BADGE ================= */}
-                                            {doctor.department?.name && (
-                                                <div className="absolute bottom-4 left-4">
-                                                    <span className="inline-flex items-center gap-1.5 rounded-full border border-[#36B9A6]/30 bg-[#071E2B]/90 px-3 py-1.5 text-xs font-semibold capitalize text-[#6ED6C5] shadow-lg backdrop-blur-md">
-                                                        <Stethoscope className="size-3.5" />
-                                                        {doctor.department.name}
-                                                    </span>
-                                                </div>
-                                            )}
-                                        </div>
-
-                                        {/* ================= CONTENT ================= */}
-                                        <div className="flex flex-col p-5">
-
-                                            {/* Doctor Name */}
-                                            <h3 className="text-lg font-semibold text-white transition-colors group-hover:text-[#6ED6C5]">
-                                                {doctor.user?.name ??
-                                                    "Doctor"}
-                                            </h3>
-
-                                            {/* Specialization */}
-                                            <p className="mt-1 text-sm font-medium text-[#36B9A6]">
-                                                {doctor.specialization}
-                                            </p>
-
-                                            {/* Qualification */}
-                                            <p className="mt-1 line-clamp-1 text-xs text-slate-400">
-                                                {doctor.qualification}
-                                            </p>
-
-                                            {/* ================= SCHEDULE ================= */}
-                                            <div className="mt-4">
-                                                <p className="mb-2 text-[10px] font-semibold uppercase tracking-[0.15em] text-slate-500">
-                                                    Available
-                                                </p>
-
-                                                {schedules.length === 0 ? (
-                                                    <span className="text-xs text-slate-500">
-                                                        Schedule not available
-                                                    </span>
-                                                ) : (
-                                                    <div className="flex flex-wrap gap-1.5">
-                                                        {schedules.map(
-                                                            (schedule) => (
-                                                                <span
-                                                                    key={
-                                                                        schedule.id
-                                                                    }
-                                                                    className="rounded-md border border-white/5 bg-white/5 px-2 py-1 text-[11px] text-slate-300"
-                                                                >
-                                                                    {DAY_SHORT[
-                                                                        schedule
-                                                                            .day
-                                                                    ] ??
-                                                                        schedule.day}
-                                                                </span>
-                                                            )
-                                                        )}
-                                                    </div>
-                                                )}
-                                            </div>
-
-                                            {/* Divider */}
-                                            <div className="my-4 h-px bg-white/10" />
-
-                                            {/* ================= FOOTER ================= */}
-                                            <div className="flex items-center justify-between">
-                                                <div>
-                                                    <p className="text-[10px] uppercase tracking-wider text-slate-500">
-                                                        Consultation fee
-                                                    </p>
-
-                                                    <p className="mt-0.5 text-sm font-semibold text-white">
-                                                        Rs.{" "}
-                                                        {
-                                                            doctor.consultation_fee
-                                                        }
-                                                    </p>
-                                                </div>
-
-                                                <span className="inline-flex items-center gap-1 text-xs font-semibold text-[#36B9A6] transition-colors group-hover:text-[#6ED6C5]">
-                                                    View Profile
-                                                    <ArrowUpRight className="size-3.5 transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
-                                                </span>
-                                            </div>
-                                        </div>
-                                    </Link>
-                                </motion.div>
-                            )
-                        })}
+                        {doctors.map((doctor, index) => (
+                            <motion.div
+                                key={doctor.id}
+                                initial={{ opacity: 0, y: 25 }}
+                                whileInView={{ opacity: 1, y: 0 }}
+                                viewport={{ once: true, amount: 0.2 }}
+                                transition={{ duration: 0.5, delay: index * 0.08 }}
+                                className="w-72 shrink-0 snap-start"
+                            >
+                                <DoctorCard
+                                    doctor={doctor}
+                                    schedules={schedulesByDoctor[doctor.id] ?? []}
+                                    onBook={openBookingModal}
+                                />
+                            </motion.div>
+                        ))}
                     </div>
                 )}
 
@@ -309,6 +201,17 @@ export function DoctorsSection() {
                     <ArrowUpRight className="size-4" />
                 </Link>
             </div>
+
+            {/* ================= BOOKING MODAL ================= */}
+            <BookingModal
+                isOpen={isBookingModalOpen}
+                doctor={selectedDoctor}
+                schedules={selectedDoctor ? schedulesByDoctor[selectedDoctor.id] ?? [] : []}
+                selectedSchedule={selectedSchedule}
+                onSelectSchedule={setSelectedSchedule}
+                onClose={closeBookingModal}
+                onConfirm={handleBookingConfirm}
+            />
         </section>
     )
 }
