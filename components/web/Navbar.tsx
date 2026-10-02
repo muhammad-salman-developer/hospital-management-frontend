@@ -38,7 +38,7 @@ export default function Navbar() {
                 >
                     <div className="relative h-15 w-15 overflow-hidden rounded-xl">
                         <Image
-                            src="/hms-logo.png"
+                            src="/hmms.png"
                             alt="HMS Logo"
                             fill
                             className="object-cover"

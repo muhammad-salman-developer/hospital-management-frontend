@@ -20,23 +20,19 @@ export default function Footer() {
 
             {/* Main Footer */}
             <div className="mx-auto max-w-7xl px-6 py-16 lg:px-8">
-                <div className="grid gap-12 sm:grid-cols-2 lg:grid-cols-4">
+                <div className="grid gap-12 sm:grid-cols-2 lg:grid-cols-3">
 
                     {/* Column 1 - Logo & Description */}
                     <div>
                         <Link
                             href="/"
-                            className="inline-flex items-center gap-2"
+                            className="inline-flex items-center text-center text-white/90 transition hover:text-[#36B9A6]   "
                         >
-                            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#36B9A6]">
-                                <span className="text-lg font-bold text-[#071E2B]">
-                                    H
-                                </span>
-                            </div>
-
-                            <span className="text-xl font-semibold tracking-tight">
-                                HMS
-                            </span>
+                            <img
+                                src="/hmms.png"
+                                alt="HMS Logo"
+                                className="h-12 w-auto object-contain"
+                            />
                         </Link>
 
                         <p className="mt-5 max-w-xs text-sm leading-6 text-white/55">
@@ -80,6 +76,8 @@ export default function Footer() {
                             </Link>
                         </div>
                     </div>
+
+
 
                     {/* Column 2 - Quick Links */}
                     <div>
@@ -132,64 +130,19 @@ export default function Footer() {
                                     Login
                                 </Link>
                             </li>
-                        </ul>
-                    </div>
-
-                    {/* Column 3 - Services */}
-                    <div>
-                        <h3 className="text-sm font-semibold uppercase tracking-wider text-white">
-                            Services
-                        </h3>
-
-                        <ul className="mt-5 space-y-3">
-                            <li>
-                                <Link
-                                    href="/doctors"
-                                    className="text-sm text-white/55 transition hover:text-[#36B9A6]"
-                                >
-                                    Find a Doctor
-                                </Link>
-                            </li>
 
                             <li>
                                 <Link
-                                    href="/appointments"
+                                    href="/register"
                                     className="text-sm text-white/55 transition hover:text-[#36B9A6]"
                                 >
-                                    Book Appointment
-                                </Link>
-                            </li>
-
-                            <li>
-                                <Link
-                                    href="/departments"
-                                    className="text-sm text-white/55 transition hover:text-[#36B9A6]"
-                                >
-                                    Medical Departments
-                                </Link>
-                            </li>
-
-                            <li>
-                                <Link
-                                    href="/records"
-                                    className="text-sm text-white/55 transition hover:text-[#36B9A6]"
-                                >
-                                    Medical Records
-                                </Link>
-                            </li>
-
-                            <li>
-                                <Link
-                                    href="/prescriptions"
-                                    className="text-sm text-white/55 transition hover:text-[#36B9A6]"
-                                >
-                                    Prescriptions
+                                    Register
                                 </Link>
                             </li>
                         </ul>
                     </div>
 
-                    {/* Column 4 - Contact */}
+                    {/* Column 3 - Contact */}
                     <div>
                         <h3 className="text-sm font-semibold uppercase tracking-wider text-white">
                             Contact Us
@@ -262,4 +215,3 @@ export default function Footer() {
         </footer>
     )
 }
-

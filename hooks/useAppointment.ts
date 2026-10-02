@@ -14,8 +14,9 @@ export function useAppointments() {
     setError(null)
 
     try {
-      const res = await getAppointments()
-      setAppointments(res.data.data.data ?? res.data.data)
+      const result = await getAppointments()
+      // result = { current_page, data: [...], ... } (pagination object)
+      setAppointments(result?.data ?? [])
     } catch (err) {
       console.error(err)
       setError("Failed to load appointments.")

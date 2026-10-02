@@ -15,7 +15,7 @@ import { Doctor } from "@/types/doctor"
 import { DoctorSchedule } from "@/types/doctorSchedule"
 import { DAY_SHORT, STORAGE_URL } from "@/lib/constants"
 import BookingModal from "@/components/web/doctors/BookingModal"
-
+import DoctorReviews from "@/components/web/doctors/DoctorReviews"
 export default function DoctorProfilePage() {
     const params = useParams()
     const router = useRouter()
@@ -270,6 +270,9 @@ export default function DoctorProfilePage() {
                     setSelectedSchedule(null)
                 }}
             />
+            <div className="mt-8">
+                <DoctorReviews doctorId={doctor.id} />
+            </div>
         </section>
     )
 }

@@ -42,6 +42,7 @@ const menuItems = [
   { title: "Pharmacists", url: "/admin/pharmacists", icon: Pill },
   { title: "Appointments", url: "/admin/appointments", icon: Calendar },
   { title: "Payments", url: "/admin/payments", icon: CreditCard },
+  { title: "Reviews", url: "/admin/reviews", icon: CreditCard },
 ];
 
 export function AdminSidebar() {

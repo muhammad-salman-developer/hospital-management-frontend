@@ -1,15 +1,6 @@
-export type AppointmentStatus = "pending" | "confirmed" | "completed" | "cancelled"
-export type PaymentMethod = "jazzcash" | "easypaisa" | "cash"
-export type PaymentStatus = "unpaid" | "pending_verification" | "paid" | "failed"
+import { Payment } from "@/types/payment"
 
-export interface Payment {
-  id: number
-  appointment_id: number
-  amount: string
-  method: PaymentMethod | null
-  transaction_id: string | null
-  status: PaymentStatus
-}
+export type AppointmentStatus = "pending" | "confirmed" | "cancelled"
 
 export interface Appointment {
   id: number
@@ -30,6 +21,17 @@ export interface Appointment {
     user?: {
       name: string
     }
+    department?: {
+      name: string
+    }
+    image?: string | null
   }
   payment?: Payment
+  review?: {
+    id: number
+    rating: number
+    comment: string | null
+  } | null
 }
+
+

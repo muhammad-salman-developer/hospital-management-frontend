@@ -1,5 +1,5 @@
 import api from "@/lib/axios"
-import { AppointmentStatus, PaymentMethod } from "@/types/appointment"
+import { AppointmentStatus, } from "@/types/appointment"
 
 export interface AppointmentData {
   patient_id: number
@@ -8,7 +8,7 @@ export interface AppointmentData {
   appointment_date: string
   appointment_time: string
   amount: number
-  method?: PaymentMethod | ""
+  // method?: PaymentMethod | ""
 }
 
 export interface AppointmentUpdateData {
@@ -17,20 +17,40 @@ export interface AppointmentUpdateData {
   status?: AppointmentStatus
 }
 
-export const getAppointments = () => api.get("/appointments")
+// ================= CORE CRUD =================
 
-export const getAppointment = (id: number) => api.get(`/appointments/${id}`)
+export async function getAppointments() {
+  const res = await api.get("/appointments")
+  return res.data.data
+}
 
-export const createAppointment = (data: AppointmentData) =>
-  api.post("/appointments", data)
+export async function getMyAppointments() {
+  const res = await api.get("/my-appointments")
+  return res.data.data
+}
 
-export const updateAppointment = (id: number, data: AppointmentUpdateData) =>
-  api.put(`/appointments/${id}`, data)
+export async function getAppointment(id: number) {
+  const res = await api.get(`/appointments/${id}`)
+  return res.data.data
+}
 
-export const deleteAppointment = (id: number) =>
-  api.delete(`/appointments/${id}`)
+export async function createAppointment(data: AppointmentData) {
+  const res = await api.post("/appointments", data)
+  return res.data.data
+}
 
-// Payment actions (appointment_id based)
+export async function updateAppointment(id: number, data: AppointmentUpdateData) {
+  const res = await api.put(`/appointments/${id}`, data)
+  return res.data.data
+}
+
+export async function deleteAppointment(id: number) {
+  const res = await api.delete(`/appointments/${id}`)
+  return res.data
+}
+
+// ================= PAYMENT ACTIONS (appointment_id based) =================
+
 export const submitTransaction = (
   appointmentId: number,
   data: { method: "jazzcash" | "easypaisa"; transaction_id: string }
