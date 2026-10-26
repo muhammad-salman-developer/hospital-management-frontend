@@ -48,6 +48,10 @@ export async function deleteAppointment(id: number) {
   const res = await api.delete(`/appointments/${id}`)
   return res.data
 }
+export async function getDoctorAppointments() {
+  const res = await api.get("/doctor/appointments");
+  return res.data.data;
+}
 
 // ================= PAYMENT ACTIONS (appointment_id based) =================
 

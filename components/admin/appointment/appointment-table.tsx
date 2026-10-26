@@ -36,6 +36,7 @@ interface AppointmentTableProps {
     appointments: Appointment[]
     onDelete: (id: number) => Promise<void>
     onUpdated: () => void
+    basePath?: string
 }
 
 const statusVariant: Record<string, "default" | "secondary" | "destructive"> = {
@@ -45,20 +46,30 @@ const statusVariant: Record<string, "default" | "secondary" | "destructive"> = {
     cancelled: "destructive",
 }
 
-export function AppointmentTable({ appointments, onDelete, onUpdated }: AppointmentTableProps) {
+export function AppointmentTable({
+    appointments,
+    onDelete,
+    onUpdated,
+    basePath = "/admin/appointments",
+}: AppointmentTableProps) {
     const router = useRouter()
-    const [editingAppointment, setEditingAppointment] = useState<Appointment | null>(null)
-    const [deletingAppointment, setDeletingAppointment] = useState<Appointment | null>(null)
+
+    const [editingAppointment, setEditingAppointment] =
+        useState<Appointment | null>(null)
+    const [deletingAppointment, setDeletingAppointment] =
+        useState<Appointment | null>(null)
     const [deleteLoading, setDeleteLoading] = useState(false)
 
     const handleConfirmDelete = async () => {
         if (!deletingAppointment) return
+
         setDeleteLoading(true)
+
         try {
             await onDelete(deletingAppointment.id)
             setDeletingAppointment(null)
             toast.success("Appointment deleted successfully")
-        } catch (err) {
+        } catch {
             toast.error("Failed to delete appointment")
         } finally {
             setDeleteLoading(false)
@@ -77,7 +88,7 @@ export function AppointmentTable({ appointments, onDelete, onUpdated }: Appointm
         <>
             <Table className="border border-[#42182b]/20">
                 <TableHeader>
-                    <TableRow>
+                    <TableRow className="bg-[#361221] hover:bg-[#361221]">
                         <TableHead className="font-semibold text-white">Patient</TableHead>
                         <TableHead className="font-semibold text-white">Doctor</TableHead>
                         <TableHead className="font-semibold text-white">Date</TableHead>
@@ -86,50 +97,77 @@ export function AppointmentTable({ appointments, onDelete, onUpdated }: Appointm
                         <TableHead className="font-semibold text-white text-right">Actions</TableHead>
                     </TableRow>
                 </TableHeader>
+
                 <TableBody>
                     {appointments.map((appointment) => (
                         <TableRow key={appointment.id}>
                             <TableCell className="font-medium">
-                                {appointment.patient?.name ?? "—"} {appointment.patient?.last_name ?? ""}
+                                {appointment.patient?.name ?? "—"}{" "}
+                                {appointment.patient?.last_name ?? ""}
                             </TableCell>
+
                             <TableCell>
                                 {appointment.doctor?.user?.name ?? "—"}
                             </TableCell>
+
                             <TableCell>{appointment.appointment_date}</TableCell>
                             <TableCell>{appointment.appointment_time}</TableCell>
+
                             <TableCell>
-                                <Badge variant={statusVariant[appointment.status] ?? "secondary"} className="capitalize">
+                                <Badge
+                                    variant={
+                                        statusVariant[appointment.status] ?? "secondary"
+                                    }
+                                    className="capitalize"
+                                >
                                     {appointment.status}
                                 </Badge>
                             </TableCell>
+
                             <TableCell className="text-right">
                                 <DropdownMenu>
                                     <DropdownMenuTrigger
                                         render={
-                                            <Button variant="ghost" size="icon" className="size-8 cursor-pointer">
+                                            <Button
+                                                variant="ghost"
+                                                size="icon"
+                                                className="size-8 cursor-pointer"
+                                            >
                                                 <MoreHorizontalIcon className="size-4" />
                                                 <span className="sr-only">Open menu</span>
                                             </Button>
                                         }
                                     />
+
                                     <DropdownMenuContent align="end">
                                         <DropdownMenuItem
                                             className="cursor-pointer"
-                                            onClick={() => router.push(`/admin/appointments/${appointment.id}`)}
+                                            onClick={() =>
+                                                router.push(
+                                                    `${basePath}/${appointment.id}`
+                                                )
+                                            }
                                         >
                                             View
                                         </DropdownMenuItem>
+
                                         <DropdownMenuItem
                                             className="cursor-pointer"
-                                            onClick={() => setEditingAppointment(appointment)}
+                                            onClick={() =>
+                                                setEditingAppointment(appointment)
+                                            }
                                         >
                                             Edit
                                         </DropdownMenuItem>
+
                                         <DropdownMenuSeparator />
+
                                         <DropdownMenuItem
                                             className="cursor-pointer"
                                             variant="destructive"
-                                            onClick={() => setDeletingAppointment(appointment)}
+                                            onClick={() =>
+                                                setDeletingAppointment(appointment)
+                                            }
                                         >
                                             Delete
                                         </DropdownMenuItem>
@@ -144,7 +182,9 @@ export function AppointmentTable({ appointments, onDelete, onUpdated }: Appointm
             {/* Edit Dialog */}
             <Dialog
                 open={!!editingAppointment}
-                onOpenChange={(open) => !open && setEditingAppointment(null)}
+                onOpenChange={(open) =>
+                    !open && setEditingAppointment(null)
+                }
             >
                 <DialogContent className="max-h-[90vh] overflow-y-auto">
                     <DialogHeader>
@@ -157,8 +197,10 @@ export function AppointmentTable({ appointments, onDelete, onUpdated }: Appointm
                             initialData={{
                                 patient_id: String(editingAppointment.patient_id),
                                 doctor_id: String(editingAppointment.doctor_id),
-                                appointment_date: editingAppointment.appointment_date,
-                                appointment_time: editingAppointment.appointment_time,
+                                appointment_date:
+                                    editingAppointment.appointment_date,
+                                appointment_time:
+                                    editingAppointment.appointment_time,
                                 status: editingAppointment.status,
                             }}
                             onSubmit={async (data) => {
@@ -181,7 +223,9 @@ export function AppointmentTable({ appointments, onDelete, onUpdated }: Appointm
             {/* Delete Confirmation Dialog */}
             <Dialog
                 open={!!deletingAppointment}
-                onOpenChange={(open) => !open && setDeletingAppointment(null)}
+                onOpenChange={(open) =>
+                    !open && setDeletingAppointment(null)
+                }
             >
                 <DialogContent>
                     <DialogHeader>
@@ -209,6 +253,7 @@ export function AppointmentTable({ appointments, onDelete, onUpdated }: Appointm
                         >
                             Cancel
                         </Button>
+
                         <Button
                             variant="destructive"
                             className="cursor-pointer"

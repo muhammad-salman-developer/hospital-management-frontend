@@ -1,33 +1,56 @@
 "use client"
 
+import { useEffect, useState } from "react"
 import { motion } from "framer-motion"
 import { Quote, Star } from "lucide-react"
+import api from "@/lib/axios"
 
-const reviews = [
-    {
-        name: "Muhammad Salman",
-        role: "Patient",
-        review:
-            "The whole experience was smooth and professional. The doctor was very attentive and explained everything clearly.",
-        rating: 5,
-    },
-    {
-        name: "Sarah Khan",
-        role: "Patient",
-        review:
-            "Booking an appointment was very easy and the doctor was excellent. I really liked the overall healthcare experience.",
-        rating: 5,
-    },
-    {
-        name: "Ahmed Raza",
-        role: "Patient",
-        review:
-            "Very friendly staff and professional doctors. The appointment process was quick and convenient.",
-        rating: 4,
-    },
-]
+interface Review {
+    id: number
+    rating: number
+    comment: string | null
+    created_at: string
+    patient?: {
+        name: string
+        last_name?: string | null
+    }
+}
 
 export default function Reviews() {
+    const [reviews, setReviews] = useState<Review[]>([])
+    const [loading, setLoading] = useState(true)
+
+    useEffect(() => {
+        const fetchReviews = async () => {
+            try {
+                const res = await api.get("/reviews")
+                const data: Review[] = res.data.data ?? []
+
+                // Sirf comment wali reviews ko priority do, phir latest 3 le lo
+                const withComments = data.filter(
+                    (r) => r.comment && r.comment.trim() !== ""
+                )
+                const sorted = (withComments.length > 0 ? withComments : data).sort(
+                    (a, b) =>
+                        new Date(b.created_at).getTime() -
+                        new Date(a.created_at).getTime()
+                )
+
+                setReviews(sorted.slice(0, 3))
+            } catch (error) {
+                console.error("Failed to fetch reviews:", error)
+            } finally {
+                setLoading(false)
+            }
+        }
+
+        fetchReviews()
+    }, [])
+
+    if (!loading && reviews.length === 0) {
+        return null
+    }
+
     return (
         <section className="relative overflow-hidden bg-[#071E2B] py-24">
             {/* Background Glow */}
@@ -61,74 +84,91 @@ export default function Reviews() {
                 </motion.div>
 
                 {/* Reviews */}
-                <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-                    {reviews.map((review, index) => (
-                        <motion.div
-                            key={review.name}
-                            initial={{ opacity: 0, y: 40 }}
-                            whileInView={{ opacity: 1, y: 0 }}
-                            viewport={{ once: true }}
-                            transition={{
-                                duration: 0.5,
-                                delay: index * 0.15,
-                            }}
-                            className="group relative rounded-2xl border border-white/10 bg-white/[0.04] p-7 backdrop-blur-sm transition-all duration-300 hover:-translate-y-1 hover:border-[#36B9A6]/40 hover:bg-white/[0.06]"
-                        >
-                            {/* Quote */}
-                            <div className="absolute right-6 top-6">
-                                <Quote className="h-10 w-10 text-[#36B9A6]/20" />
-                            </div>
+                {loading ? (
+                    <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+                        {[...Array(3)].map((_, i) => (
+                            <div
+                                key={i}
+                                className="h-80 animate-pulse rounded-2xl bg-white/5"
+                            />
+                        ))}
+                    </div>
+                ) : (
+                    <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+                        {reviews.map((review, index) => {
+                            const name = review.patient
+                                ? `${review.patient.name} ${review.patient.last_name ?? ""}`.trim()
+                                : "Patient"
 
-                            {/* Stars */}
-                            <div className="mb-6 flex gap-1">
-                                {Array.from({ length: 5 }).map(
-                                    (_, starIndex) => (
-                                        <Star
-                                            key={starIndex}
-                                            className={`h-4 w-4 ${
-                                                starIndex <
-                                                review.rating
-                                                    ? "fill-[#36B9A6] text-[#36B9A6]"
-                                                    : "text-white/20"
-                                            }`}
-                                        />
-                                    )
-                                )}
-                            </div>
+                            return (
+                                <motion.div
+                                    key={review.id}
+                                    initial={{ opacity: 0, y: 40 }}
+                                    whileInView={{ opacity: 1, y: 0 }}
+                                    viewport={{ once: true }}
+                                    transition={{
+                                        duration: 0.5,
+                                        delay: index * 0.15,
+                                    }}
+                                    className="group relative rounded-2xl border border-white/10 bg-white/[0.04] p-7 backdrop-blur-sm transition-all duration-300 hover:-translate-y-1 hover:border-[#36B9A6]/40 hover:bg-white/[0.06]"
+                                >
+                                    {/* Quote */}
+                                    <div className="absolute right-6 top-6">
+                                        <Quote className="h-10 w-10 text-[#36B9A6]/20" />
+                                    </div>
 
-                            {/* Review */}
-                            <p className="min-h-[120px] text-[15px] leading-7 text-white/70">
-                                “{review.review}”
-                            </p>
+                                    {/* Stars */}
+                                    <div className="mb-6 flex gap-1">
+                                        {Array.from({ length: 5 }).map(
+                                            (_, starIndex) => (
+                                                <Star
+                                                    key={starIndex}
+                                                    className={`h-4 w-4 ${
+                                                        starIndex < review.rating
+                                                            ? "fill-[#36B9A6] text-[#36B9A6]"
+                                                            : "text-white/20"
+                                                    }`}
+                                                />
+                                            )
+                                        )}
+                                    </div>
 
-                            {/* Divider */}
-                            <div className="my-6 h-px bg-white/10" />
-
-                            {/* Patient */}
-                            <div className="flex items-center gap-3">
-                                <div className="flex h-11 w-11 items-center justify-center rounded-full bg-[#36B9A6]/15 text-sm font-semibold text-[#6ED6C5]">
-                                    {review.name
-                                        .split(" ")
-                                        .map((word) => word[0])
-                                        .join("")
-                                        .slice(0, 2)}
-                                </div>
-
-                                <div>
-                                    <h3 className="text-sm font-semibold text-white">
-                                        {review.name}
-                                    </h3>
-
-                                    <p className="mt-0.5 text-xs text-white/40">
-                                        {review.role}
+                                    {/* Review */}
+                                    <p className="min-h-[120px] text-[15px] leading-7 text-white/70">
+                                        "{review.comment ?? "Great experience overall."}"
                                     </p>
-                                </div>
-                            </div>
-                        </motion.div>
-                    ))}
-                </div>
+
+                                    {/* Divider */}
+                                    <div className="my-6 h-px bg-white/10" />
+
+                                    {/* Patient */}
+                                    <div className="flex items-center gap-3">
+                                        <div className="flex h-11 w-11 items-center justify-center rounded-full bg-[#36B9A6]/15 text-sm font-semibold text-[#6ED6C5]">
+                                            {name
+                                                .split(" ")
+                                                .filter(Boolean)
+                                                .map((word) => word[0])
+                                                .join("")
+                                                .slice(0, 2)
+                                                .toUpperCase()}
+                                        </div>
+
+                                        <div>
+                                            <h3 className="text-sm font-semibold text-white">
+                                                {name}
+                                            </h3>
+
+                                            <p className="mt-0.5 text-xs text-white/40">
+                                                Patient
+                                            </p>
+                                        </div>
+                                    </div>
+                                </motion.div>
+                            )
+                        })}
+                    </div>
+                )}
             </div>
         </section>
     )
 }
-

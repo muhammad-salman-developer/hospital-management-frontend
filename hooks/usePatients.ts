@@ -1,7 +1,12 @@
+
 "use client"
 
 import { useState, useCallback } from "react"
-import { getPatients, deletePatientProfile } from "@/services/patientService"
+import {
+    getPatients,
+    getDoctorPatients,
+    deletePatientProfile,
+} from "@/services/patientService"
 import { Patient } from "@/types/patient"
 
 export function usePatients() {
@@ -24,6 +29,21 @@ export function usePatients() {
         }
     }, [])
 
+    const fetchDoctorPatients = useCallback(async () => {
+        setLoading(true)
+        setError(null)
+
+        try {
+            const data = await getDoctorPatients()
+            setPatients(Array.isArray(data) ? data : data?.data ?? [])
+        } catch (err) {
+            console.error(err)
+            setError("Failed to load your patients.")
+        } finally {
+            setLoading(false)
+        }
+    }, [])
+
     const removePatient = useCallback(async (id: number) => {
         await deletePatientProfile(id)
         setPatients((prev) => prev.filter((p) => p.id !== id))
@@ -34,6 +54,7 @@ export function usePatients() {
         loading,
         error,
         fetchPatients,
+        fetchDoctorPatients,
         removePatient,
     }
 }

@@ -80,7 +80,7 @@ export default function ContactPage() {
             </section>
 
             {/* ================= CONTACT GRID ================= */}
-            <section className="pb-24">
+            <section className="pb-24 lg:mt-10">
                 <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
                     <div className="grid grid-cols-1 gap-10 lg:grid-cols-5">
 
@@ -122,10 +122,10 @@ export default function ContactPage() {
                         </div>
 
                         {/* ================= CONTACT FORM ================= */}
-                        <div className="lg:col-span-3">
+                        <div className="lg:col-span-3 ">
                             <form
                                 onSubmit={handleSubmit}
-                                className="rounded-2xl border border-white/10 bg-[#082C3C] p-6 sm:p-8"
+                                className="rounded-2xl border border-white/10 bg-[#082C3C] p-6 sm:p-8 lg:p-13"
                             >
                                 <h2 className="text-lg font-semibold text-white">
                                     Send us a message
@@ -208,7 +208,7 @@ export default function ContactPage() {
                                 <button
                                     type="submit"
                                     disabled={sending}
-                                    className="mt-6 inline-flex w-full items-center justify-center gap-2 rounded-full bg-[#36B9A6] py-3 text-sm font-semibold text-[#071E2B] transition-all hover:bg-[#6ED6C5] disabled:cursor-not-allowed disabled:opacity-50 sm:w-auto sm:px-8"
+                                    className="mt-6 inline-flex w-full items-center justify-center gap-2 rounded-full bg-[#36B9A6] py-3 text-sm font-semibold text-[#071E2B] transition-all hover:bg-[#6ED6C5] disabled:cursor-not-allowed disabled:opacity-50 sm:w-auto sm:px-8 cursor-pointer"
                                 >
                                     {sending ? (
                                         "Sending..."

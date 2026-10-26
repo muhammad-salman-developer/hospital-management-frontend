@@ -1,6 +1,8 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
+import Link from "next/link";
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -30,40 +32,55 @@ export default function RegisterPage() {
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-800 px-4 py-10">
-      <div className="w-full max-w-sm rounded-3xl border border-white/20 bg-white/10 backdrop-blur-xl shadow-[0_0_60px_rgba(59,130,246,0.3)] p-8">
-        {/* Icon Circle */}
-        <div className="flex justify-center mb-6">
-          <div className="w-20 h-20 rounded-full border-2 border-blue-400/50 flex items-center justify-center shadow-[0_0_25px_rgba(96,165,250,0.6)]">
-            <User className="w-9 h-9 text-blue-300" strokeWidth={1.5} />
+    <div className="relative flex min-h-screen items-center justify-center overflow-hidden bg-[#071E2B] px-4 py-10">
+      {/* Background glow */}
+      <div className="pointer-events-none absolute -left-32 top-10 h-96 w-96 rounded-full bg-[#36B9A6]/10 blur-3xl" />
+      <div className="pointer-events-none absolute -right-32 bottom-10 h-96 w-96 rounded-full bg-[#36B9A6]/5 blur-3xl" />
+
+      <div className="relative w-full max-w-sm rounded-3xl border border-white/10 bg-[#082C3C] p-8 shadow-2xl">
+        {/* Logo */}
+        <div className="mb-6 flex justify-center">
+          <div className="relative h-16 w-16 overflow-hidden rounded-2xl border border-[#36B9A6]/30">
+            <Image
+              src="/hmms.png"
+              alt="HMS Logo"
+              fill
+              className="object-cover"
+              priority
+            />
           </div>
         </div>
 
-        <h2 className="text-center text-white/90 text-lg font-medium mb-6 tracking-wide">
-          Patient Registration
-        </h2>
+        <h1 className="text-center text-xl font-bold text-white">
+          Create an Account
+        </h1>
+        <p className="mt-1 text-center text-sm text-slate-400">
+          Register to start booking appointments
+        </p>
 
         {error && (
-          <p className="text-red-400 text-sm text-center mb-4">{error}</p>
+          <div className="mt-4 rounded-lg bg-red-500/10 px-3 py-2 text-center text-xs text-red-400">
+            {error}
+          </div>
         )}
 
-        <form onSubmit={handleSubmit} className="space-y-3">
+        <form onSubmit={handleSubmit} className="mt-6 space-y-3">
           {/* Name */}
-          <div className="flex items-center gap-3 rounded-full bg-blue-950/50 border border-blue-400/20 px-4 py-3">
-            <User className="w-4 h-4 text-blue-300 shrink-0" />
+          <div className="flex items-center gap-3 rounded-full border border-white/10 bg-white/5 px-4 py-3 transition-colors focus-within:border-[#36B9A6]/50">
+            <User className="size-4 shrink-0 text-[#36B9A6]" />
             <Input
               id="name"
               name="name"
               placeholder="Full Name"
               onChange={handleChange}
               required
-              className="border-0 bg-transparent text-white placeholder:text-blue-200/60 focus-visible:ring-0 h-auto p-0"
+              className="h-auto border-0 bg-transparent p-0 text-white placeholder:text-slate-500 focus-visible:ring-0"
             />
           </div>
 
           {/* Email */}
-          <div className="flex items-center gap-3 rounded-full bg-blue-950/50 border border-blue-400/20 px-4 py-3">
-            <Mail className="w-4 h-4 text-blue-300 shrink-0" />
+          <div className="flex items-center gap-3 rounded-full border border-white/10 bg-white/5 px-4 py-3 transition-colors focus-within:border-[#36B9A6]/50">
+            <Mail className="size-4 shrink-0 text-[#36B9A6]" />
             <Input
               id="email"
               name="email"
@@ -71,26 +88,26 @@ export default function RegisterPage() {
               placeholder="Email"
               onChange={handleChange}
               required
-              className="border-0 bg-transparent text-white placeholder:text-blue-200/60 focus-visible:ring-0 h-auto p-0"
+              className="h-auto border-0 bg-transparent p-0 text-white placeholder:text-slate-500 focus-visible:ring-0"
             />
           </div>
 
           {/* Phone */}
-          <div className="flex items-center gap-3 rounded-full bg-blue-950/50 border border-blue-400/20 px-4 py-3">
-            <Phone className="w-4 h-4 text-blue-300 shrink-0" />
+          <div className="flex items-center gap-3 rounded-full border border-white/10 bg-white/5 px-4 py-3 transition-colors focus-within:border-[#36B9A6]/50">
+            <Phone className="size-4 shrink-0 text-[#36B9A6]" />
             <Input
               id="phone_number"
               name="phone_number"
               placeholder="Phone Number"
               onChange={handleChange}
               required
-              className="border-0 bg-transparent text-white placeholder:text-blue-200/60 focus-visible:ring-0 h-auto p-0"
+              className="h-auto border-0 bg-transparent p-0 text-white placeholder:text-slate-500 focus-visible:ring-0"
             />
           </div>
 
           {/* Password */}
-          <div className="flex items-center gap-3 rounded-full bg-blue-950/50 border border-blue-400/20 px-4 py-3">
-            <Lock className="w-4 h-4 text-blue-300 shrink-0" />
+          <div className="flex items-center gap-3 rounded-full border border-white/10 bg-white/5 px-4 py-3 transition-colors focus-within:border-[#36B9A6]/50">
+            <Lock className="size-4 shrink-0 text-[#36B9A6]" />
             <Input
               id="password"
               name="password"
@@ -98,13 +115,13 @@ export default function RegisterPage() {
               placeholder="Password"
               onChange={handleChange}
               required
-              className="border-0 bg-transparent text-white placeholder:text-blue-200/60 focus-visible:ring-0 h-auto p-0"
+              className="h-auto border-0 bg-transparent p-0 text-white placeholder:text-slate-500 shadow-none focus-visible:ring-0 dark:bg-transparent focus:bg-transparent!"
             />
           </div>
 
           {/* Confirm Password */}
-          <div className="flex items-center gap-3 rounded-full bg-blue-950/50 border border-blue-400/20 px-4 py-3">
-            <Lock className="w-4 h-4 text-blue-300 shrink-0" />
+          <div className="flex items-center gap-3 rounded-full border border-white/10 bg-white/5 px-4 py-3 transition-colors focus-within:border-[#36B9A6]/50">
+            <Lock className="size-4 shrink-0 text-[#36B9A6]" />
             <Input
               id="password_confirmation"
               name="password_confirmation"
@@ -112,7 +129,7 @@ export default function RegisterPage() {
               placeholder="Confirm Password"
               onChange={handleChange}
               required
-              className="border-0 bg-transparent text-white placeholder:text-blue-200/60 focus-visible:ring-0 h-auto p-0"
+              className="h-auto border-0 bg-transparent p-0 text-white placeholder:text-slate-500 shadow-none focus-visible:ring-0 dark:bg-transparent focus:bg-transparent!"
             />
           </div>
 
@@ -120,17 +137,17 @@ export default function RegisterPage() {
           <Button
             type="submit"
             disabled={loading}
-            className="w-full rounded-full bg-blue-600/80 hover:bg-blue-500 text-white tracking-wider font-medium py-6 shadow-[0_0_20px_rgba(59,130,246,0.5)] border border-blue-400/30 mt-2"
+            className="mt-2 w-full rounded-full bg-[#36B9A6] py-6 font-semibold tracking-wide text-[#071E2B] transition-all hover:bg-[#6ED6C5]  disabled:opacity-50 cursor-pointer"
           >
-            {loading ? "REGISTERING..." : "REGISTER"}
+            {loading ? "Registering..." : "Register"}
           </Button>
         </form>
 
-        <p className="text-xs text-center mt-6 text-blue-100/70">
+        <p className="mt-6 text-center text-xs text-slate-400">
           Already have an account?{" "}
-          <a href="/login" className="text-blue-300 underline hover:text-blue-200">
+          <Link href="/login" className="font-medium text-[#36B9A6] hover:text-[#6ED6C5]">
             Login
-          </a>
+          </Link>
         </p>
       </div>
     </div>

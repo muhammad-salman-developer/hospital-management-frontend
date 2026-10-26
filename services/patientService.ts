@@ -25,3 +25,8 @@ export const updatePatientProfile = (id: number, data: PatientProfileData) =>
 
 export const deletePatientProfile = (id: number) =>
   api.delete(`/patients/${id}`)
+
+export const getDoctorPatients = async () => {
+  const res = await api.get("/doctor/patients")
+  return res.data.data
+}

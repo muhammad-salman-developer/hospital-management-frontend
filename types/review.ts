@@ -11,4 +11,11 @@ export interface Review {
         name: string
         last_name?: string | null
     }
+    doctor?: {
+        id: number
+        user?: {
+            id: number
+            name: string
+        }
+    }
 }

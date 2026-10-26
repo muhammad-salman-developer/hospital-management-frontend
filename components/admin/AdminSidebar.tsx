@@ -38,11 +38,13 @@ const menuItems = [
   { title: "Doctor Shedule", url: "/admin/doctor-shedules", icon: CalendarDays },
   { title: "Patients", url: "/admin/patients", icon: Users },
   { title: "Receptionists", url: "/admin/receptionists", icon: ClipboardList },
-  { title: "Labs", url: "/admin/labs", icon: FlaskConical },
-  { title: "Pharmacists", url: "/admin/pharmacists", icon: Pill },
+  // { title: "Labs", url: "/admin/labs", icon: FlaskConical },
+  // { title: "Pharmacists", url: "/admin/pharmacists", icon: Pill },
   { title: "Appointments", url: "/admin/appointments", icon: Calendar },
   { title: "Payments", url: "/admin/payments", icon: CreditCard },
   { title: "Reviews", url: "/admin/reviews", icon: CreditCard },
+  { title: "Contacts", url: "/admin/contacts", icon: CreditCard },
+  { title: "Users", url: "/admin/users", icon: Users },
 ];
 
 export function AdminSidebar() {
@@ -59,7 +61,7 @@ export function AdminSidebar() {
     >
       <SidebarHeader>
         <div className="flex items-center gap-2 px-2 py-2 mt-3">
-          <Hospital className="w-6 h-6 text-blue-600 shrink-0 " />
+          {/* <Hospital className="w-6 h-6 text-blue-600 shrink-0 " /> */}
           <span className="font-semibold text-base group-data-[collapsible=icon]:hidden ">
             HMS Admin
           </span>

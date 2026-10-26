@@ -1,9 +1,11 @@
+
 export type Gender = "male" | "female" | "other"
 
 export interface Patient {
     id: number
     user_id: number | null
     name: string
+    email?: string | null
     phone: string | null
     last_name: string | null
     cnic: string | null
@@ -15,5 +17,5 @@ export interface Patient {
         name: string
         email: string
         phone_number: string | null
-    }
+    } | null
 }

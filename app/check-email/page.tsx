@@ -8,20 +8,28 @@ export default function CheckEmailPage() {
   const router = useRouter()
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-800 px-4">
-      <div className="w-full max-w-sm rounded-3xl border border-white/20 bg-white/10 backdrop-blur-xl shadow-[0_0_60px_rgba(59,130,246,0.3)] p-8">
+    <div className="relative flex min-h-screen items-center justify-center overflow-hidden bg-[#071E2B] px-4">
+      {/* Background glow */}
+      <div className="pointer-events-none absolute -left-32 top-10 h-96 w-96 rounded-full bg-[#36B9A6]/10 blur-3xl" />
+      <div className="pointer-events-none absolute -right-32 bottom-10 h-96 w-96 rounded-full bg-[#36B9A6]/5 blur-3xl" />
+
+      <div className="relative w-full max-w-sm rounded-3xl border border-white/10 bg-[#082C3C] p-8 shadow-2xl">
         {/* Icon Circle */}
-        <div className="flex justify-center mb-8">
-          <div className="w-20 h-20 rounded-full border-2 border-blue-400/50 flex items-center justify-center shadow-[0_0_25px_rgba(96,165,250,0.6)]">
-            <MailCheck className="w-9 h-9 text-blue-300" strokeWidth={1.5} />
+        <div className="mb-8 flex justify-center">
+          <div className="flex h-20 w-20 items-center justify-center rounded-full border-2 border-[#36B9A6]/40 shadow-[0_0_25px_rgba(54,185,166,0.25)]">
+            <MailCheck
+              className="h-9 w-9 text-[#36B9A6]"
+              strokeWidth={1.5}
+            />
           </div>
         </div>
 
-        <div className="text-center mb-8">
-          <h1 className="text-xl font-semibold text-white tracking-wide">
+        <div className="mb-8 text-center">
+          <h1 className="text-xl font-semibold tracking-wide text-white">
             Verify Your Email
           </h1>
-          <p className="mt-2 text-sm text-blue-100/70">
+
+          <p className="mt-2 text-sm text-slate-400">
             We&apos;ve sent a verification link to your email address.
             Please check your inbox and click the link to activate your
             account.
@@ -31,7 +39,7 @@ export default function CheckEmailPage() {
         <div className="space-y-3">
           <Button
             onClick={() => router.push("/login")}
-            className="w-full rounded-full bg-blue-600/80 hover:bg-blue-500 text-white tracking-wider font-medium py-6 shadow-[0_0_20px_rgba(59,130,246,0.5)] border border-blue-400/30"
+            className="w-full cursor-pointer rounded-full border border-[#36B9A6]/30 bg-[#36B9A6] py-6 font-semibold tracking-wider text-[#071E2B] transition-all hover:bg-[#6ED6C5]"
           >
             GO TO LOGIN
           </Button>
@@ -39,7 +47,7 @@ export default function CheckEmailPage() {
           <Button
             variant="outline"
             onClick={() => router.push("/resend-verification")}
-            className="w-full rounded-full bg-transparent hover:bg-blue-950/50 text-blue-200 tracking-wider font-medium py-6 border border-blue-400/30"
+            className="w-full cursor-pointer rounded-full border border-[#36B9A6]/30 bg-transparent py-6 font-medium tracking-wider text-[#36B9A6] transition-colors hover:bg-[#36B9A6]/10 hover:text-[#6ED6C5]"
           >
             DIDN&apos;T RECEIVE THE EMAIL? RESEND
           </Button>

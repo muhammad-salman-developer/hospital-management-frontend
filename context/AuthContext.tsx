@@ -144,11 +144,14 @@ export function AuthProvider({
         router.push("/admin/dashboard");
       } else if (userRole === "doctor") {
         router.push("/doctor/dashboard");
+      } else if (userRole === "receptionist") {
+        router.push("/reception/dashboard");
       } else if (userRole === "patient") {
         router.push("/patient/dashboard");
       } else {
         router.push("/dashboard");
       }
+
     } catch (err: any) {
       const message =
         err.response?.data?.message ||

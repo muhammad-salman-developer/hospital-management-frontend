@@ -3,6 +3,7 @@
 import { useState } from "react"
 import Image from "next/image"
 import Link from "next/link"
+import { usePathname } from "next/navigation"
 import { Menu, Stethoscope, User, LayoutDashboard, LogOut, ChevronDown } from "lucide-react"
 
 import {
@@ -26,6 +27,12 @@ const navLinks = [
 export default function Navbar() {
     const { user, logout } = useAuth()
     const [isMenuOpen, setIsMenuOpen] = useState(false)
+    const pathname = usePathname()
+
+    const isActive = (href: string) => {
+        if (href === "/") return pathname === "/"
+        return pathname === href || pathname.startsWith(href + "/")
+    }
 
     return (
         <header className="sticky top-0 z-50 w-full border-b border-white/10 bg-[#071E2B]/95 backdrop-blur-xl">
@@ -49,15 +56,26 @@ export default function Navbar() {
 
                 {/* Desktop Navigation */}
                 <nav className="hidden items-center gap-8 md:flex">
-                    {navLinks.map((link) => (
-                        <Link
-                            key={link.name}
-                            href={link.href}
-                            className="relative text-sm font-medium text-slate-300 transition-colors hover:text-[#36B9A6]"
-                        >
-                            {link.name}
-                        </Link>
-                    ))}
+                    {navLinks.map((link) => {
+                        const active = isActive(link.href)
+
+                        return (
+                            <Link
+                                key={link.name}
+                                href={link.href}
+                                className={`relative text-sm font-medium transition-colors ${
+                                    active
+                                        ? "text-[#36B9A6]"
+                                        : "text-slate-300 hover:text-[#36B9A6]"
+                                }`}
+                            >
+                                {link.name}
+                                {active && (
+                                    <span className="absolute -bottom-2 left-0 h-0.5 w-full rounded-full bg-[#36B9A6]" />
+                                )}
+                            </Link>
+                        )
+                    })}
                 </nav>
 
                 {/* Desktop Auth / User Menu */}
@@ -80,14 +98,14 @@ export default function Navbar() {
                                 <div className="absolute right-0 top-full w-52 overflow-hidden rounded-xl border border-white/10 bg-[#082C3C] shadow-xl">
                                     <Link
                                         href="/patient/dashboard"
-                                        className="flex items-center gap-2 px-4 py-3 text-sm text-slate-300 transition-colors hover:bg-white/5 hover:text-[#6ED6C5]"
+                                        className="flex items-center gap-2 px-4 py-3 text-sm text-slate-300 transition-colors hover:bg-white/5 hover:text-[#6ED6C5] cursor-pointer"
                                     >
                                         <LayoutDashboard className="size-4" />
                                         Dashboard
                                     </Link>
                                     <button
                                         onClick={logout}
-                                        className="flex w-full items-center gap-2 px-4 py-3 text-left text-sm text-red-400 transition-colors hover:bg-white/5"
+                                        className="flex w-full items-center gap-2 px-4 py-3 text-left text-sm text-red-400 transition-colors hover:bg-white/5 cursor-pointer"
                                     >
                                         <LogOut className="size-4" />
                                         Logout
@@ -100,7 +118,7 @@ export default function Navbar() {
                             <Link href="/login">
                                 <Button
                                     variant="ghost"
-                                    className="font-medium text-white hover:bg-white/10 hover:text-[#36B9A6]"
+                                    className="font-medium text-white hover:bg-white/10 hover:text-[#36B9A6] cursor-pointer"
                                 >
                                     Login
                                 </Button>
@@ -108,7 +126,7 @@ export default function Navbar() {
 
                             <Link href="/register">
                                 <Button
-                                    className="rounded-lg bg-[#36B9A6] px-5 font-medium text-[#071E2B] shadow-sm transition-all hover:bg-[#2FA890] hover:shadow-md"
+                                    className="rounded-lg bg-[#36B9A6] px-5 font-medium text-[#071E2B] shadow-sm transition-all hover:bg-[#2FA890] hover:shadow-md cursor-pointer"
                                 >
                                     Register
                                 </Button>
@@ -133,7 +151,7 @@ export default function Navbar() {
                                 <SheetTitle className="flex items-center gap-3 text-white">
                                     <div className="relative h-10 w-10 overflow-hidden rounded-lg">
                                         <Image
-                                            src="/images/hms-logo.png"
+                                            src="/hmms.png"
                                             alt="HMS Logo"
                                             fill
                                             className="object-cover"
@@ -171,20 +189,32 @@ export default function Navbar() {
 
                             {/* Mobile Links */}
                             <nav className="mt-8 flex flex-col gap-2">
-                                {navLinks.map((link) => (
-                                    <Link
-                                        key={link.name}
-                                        href={link.href}
-                                        className="rounded-lg px-4 py-3 text-sm font-medium text-slate-300 transition-colors hover:bg-white/5 hover:text-[#36B9A6]"
-                                    >
-                                        {link.name}
-                                    </Link>
-                                ))}
+                                {navLinks.map((link) => {
+                                    const active = isActive(link.href)
+
+                                    return (
+                                        <Link
+                                            key={link.name}
+                                            href={link.href}
+                                            className={`rounded-lg px-4 py-3 text-sm font-medium transition-colors ${
+                                                active
+                                                    ? "bg-[#36B9A6]/10 text-[#36B9A6]"
+                                                    : "text-slate-300 hover:bg-white/5 hover:text-[#36B9A6]"
+                                            }`}
+                                        >
+                                            {link.name}
+                                        </Link>
+                                    )
+                                })}
 
                                 {user && (
                                     <Link
                                         href="/patient/dashboard"
-                                        className="flex items-center gap-2 rounded-lg px-4 py-3 text-sm font-medium text-slate-300 transition-colors hover:bg-white/5 hover:text-[#36B9A6]"
+                                        className={`flex items-center gap-2 rounded-lg px-4 py-3 text-sm font-medium transition-colors ${
+                                            isActive("/patient/dashboard")
+                                                ? "bg-[#36B9A6]/10 text-[#36B9A6]"
+                                                : "text-slate-300 hover:bg-white/5 hover:text-[#36B9A6]"
+                                        }`}
                                     >
                                         <LayoutDashboard className="size-4" />
                                         Dashboard
